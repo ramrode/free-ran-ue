@@ -896,6 +896,14 @@ func (u *Ue) updateDataPlane() {
 	}
 }
 
+func (u *Ue) GetRanDataPlaneConn() net.Conn {
+	return u.ranDataPlaneConn
+}
+
+func (u *Ue) GetUeIp() string {
+	return u.pduSessionEstablishmentAccept.ueIp
+}
+
 func (u *Ue) getBearerType() uint8 {
 	switch u.accessType {
 	case models.AccessType__3_GPP_ACCESS:
