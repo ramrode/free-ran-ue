@@ -96,6 +96,7 @@ type Ue struct {
 	nrdc
 
 	ueTunnelDeviceName string
+	ignoreSetupTunnel  bool
 	ueTunnelDevice     *water.Interface
 
 	readFromTun chan []byte
@@ -187,6 +188,7 @@ func NewUe(config *model.UeConfig, logger *logger.UeLogger) *Ue {
 		},
 
 		ueTunnelDeviceName: config.Ue.UeTunnelDevice,
+		ignoreSetupTunnel:  config.Ue.IgnoreSetupTunnel,
 
 		UeLogger: logger,
 	}
@@ -690,6 +692,11 @@ STOP_WAITING:
 
 func (u *Ue) setupTunnelDevice() error {
 	u.TunLog.Infoln("Setting up UE tunnel device")
+	
+	if u.ignoreSetupTunnel {
+		u.TunLog.Warnln("Ignore tunnel device, skip setup")
+		return nil
+	}
 
 	waterInterface, err := bringUpUeTunnelDevice(u.ueTunnelDeviceName, u.ueIp)
 	if err != nil {
@@ -770,6 +777,11 @@ func (u *Ue) setupTunnelDevice() error {
 
 func (u *Ue) cleanUpTunnelDevice() error {
 	u.TunLog.Infoln("Cleaning up UE tunnel device")
+
+	if u.ignoreSetupTunnel {
+		u.TunLog.Warnln("Ignore tunnel device, skip cleanup")
+		return nil
+	}
 
 	if err := bringDownUeTunnelDevice(u.ueTunnelDeviceName); err != nil {
 		return fmt.Errorf("error bring down ue tunnel device: %+v", err)
