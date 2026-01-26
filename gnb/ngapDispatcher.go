@@ -3,6 +3,7 @@ package gnb
 import (
 	"errors"
 	"net"
+	"strings"
 
 	"github.com/free-ran-ue/free-ran-ue/v2/constant"
 	"github.com/free5gc/aper"
@@ -18,8 +19,8 @@ func (d *ngapDispatcher) start(g *Gnb) {
 	for {
 		n, err := g.n2Conn.Read(ngapBuffer)
 		if err != nil {
-			if errors.Is(err, net.ErrClosed) {
-				g.NgapLog.Debugln("NGAP dispatcher closed")
+			if errors.Is(err, net.ErrClosed) || strings.Contains(err.Error(), "bad file descriptor") {
+				g.NgapLog.Debugln("NGAP connection closed")
 				return
 			}
 			g.NgapLog.Errorf("Error reading NGAP buffer: %v", err)
